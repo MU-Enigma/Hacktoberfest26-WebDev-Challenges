@@ -10,7 +10,6 @@ next-env.d.ts
 .env*
 *.log
 .DS_Store
-.vercel/
 
 # Private planning files used to prepare this repository
 Chats with webdev head/

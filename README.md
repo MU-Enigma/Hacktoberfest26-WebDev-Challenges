@@ -52,7 +52,7 @@ Before opening a pull request, run:
 npm run check
 ```
 
-This runs linting, tests, and a production build—the same checks that run on GitHub.
+This runs linting, type checking, and tests—the same checks that run on GitHub.
 
 ## Important rules
 
@@ -67,6 +67,6 @@ This is an MU Enigma community challenge. Hacktoberfest 2026 no longer counts pu
 
 ## Maintainers
 
-Contributors do not need to read the long challenge catalog. Organizers can find issue text and publishing instructions in [docs/CHALLENGES.md](docs/CHALLENGES.md).
+Contributors do not need to read the long challenge catalog. Organizers can find issue text and publishing instructions in [CHALLENGES.md](CHALLENGES.md).
 
 Licensed under the [MIT License](LICENSE).

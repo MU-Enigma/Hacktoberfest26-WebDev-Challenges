@@ -45,7 +45,7 @@ const batches = {
 };
 
 async function readChallenges() {
-  const markdown = await readFile("docs/CHALLENGES.md", "utf8");
+  const markdown = await readFile("CHALLENGES.md", "utf8");
   const pattern =
     /^## (SIG-\d{3}) — (.+)\r?\n([\s\S]*?)(?=\r?\n## SIG-\d{3}|\r?\n---\s*(?:\r?\n|$))/gm;
   const challenges = [];
@@ -100,7 +100,7 @@ const labelCatalog = {
   "type:testing": ["D4C5F9", "Test infrastructure or coverage"],
   "type:accessibility": ["FBCA04", "Accessibility work"],
   "type:security": ["B60205", "Security or privacy sensitive"],
-  "type:devops": ["0052CC", "CI, deployment, or operations"],
+  "type:devops": ["0052CC", "CI and project automation"],
   "size:xs": ["EDEDED", "Very small change"],
   "size:s": ["DDE8C4", "Small change"],
   "size:m": ["FEF2C0", "Medium change"],

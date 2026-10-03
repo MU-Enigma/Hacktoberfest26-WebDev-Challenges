@@ -48,7 +48,7 @@ The project is complete when:
 - Operational complaints can be submitted, moderated, and tracked.
 - Mail and complaint privacy boundaries have automated tests.
 - Critical user journeys pass end-to-end tests.
-- The application is responsive, keyboard accessible, documented, and deployed.
+- The application is responsive, keyboard accessible, documented, and works locally in mock mode.
 
 Gmail is an advanced parallel adapter. Its external OAuth verification is not required for judging; test-mode integration and correct adapter behavior are sufficient.
 
@@ -65,7 +65,7 @@ Gmail is an advanced parallel adapter. Its external OAuth verification is not re
 9. Never commit tokens, email data, passwords, or real complaint information.
 10. Do not approve or merge your own pull request.
 
-Every merged PR must pass linting, tests, the production build, and accessibility checks where relevant.
+Every merged PR must pass linting, type checking, tests, and accessibility checks where relevant.
 
 ## 4. Labels to create
 
@@ -897,11 +897,11 @@ Extend the starter pipeline with every check needed for the final release.
 
 ### Acceptance criteria
 
-- Runs lockfile install, format check, lint, type check, unit tests, accessibility smoke tests, and production build.
+- Runs lockfile install, lint, type checking, and unit tests.
 - Uses mock mode and no real provider secrets.
 - Cancels superseded runs on the same pull request.
 - Reports failures with readable step names.
-- Uploads useful test artifacts without private data.
+- Keeps output short enough for first-time contributors to understand.
 
 ### Required evidence
 
@@ -952,7 +952,7 @@ Verify that mailbox and complaint data are handled according to the documented b
 
 - Completed security checklist and automated privacy tests
 
-## SIG-404 — Prepare the public release and contributor showcase
+## SIG-404 — Prepare the contributor showcase
 
 _Labels:_ level:final, track:documentation, type:devops, size:l, release:required
 
@@ -960,22 +960,21 @@ _Depends on:_ All required release issues
 
 ### Goal
 
-Ship a credible v1 release and clearly credit individual contributors.
+Prepare a clear local demonstration and credit individual contributors.
 
 ### Acceptance criteria
 
 - README explains the product, privacy boundary, mock setup, and provider status.
-- README.md, CONTRIBUTING.md, and SECURITY.md are complete.
-- Deployment uses synthetic complaint and mailbox data.
+- README.md and CONTRIBUTING.md are complete.
+- The demonstration uses synthetic complaint and mailbox data.
 - Release notes link merged issues and contributors.
 - Demo covers announcements and complaints without exposing private data.
 - Known limitations and unsupported provider states are explicit.
 
 ### Required evidence
 
-- Public deployment link
 - Tagged release and changelog
-- Five-minute release demonstration
+- Five-minute recorded or live local demonstration
 
 ---
 

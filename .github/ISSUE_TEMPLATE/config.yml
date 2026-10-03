@@ -1,8 +1,0 @@
-blank_issues_enabled: false
-contact_links:
-  - name: Contribution questions
-    url: https://github.com/MU-Enigma/Hacktoberfest26-WebDev-Challenges/discussions
-    about: Ask setup or scope questions before opening an unplanned issue.
-  - name: Security or privacy report
-    url: https://github.com/MU-Enigma/Hacktoberfest26-WebDev-Challenges/security/advisories/new
-    about: Report vulnerabilities or data exposure privately.

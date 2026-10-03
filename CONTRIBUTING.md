@@ -1,59 +1,86 @@
-# Contributing to SIGNAL
+# Beginner contribution guide
 
-Thank you for building SIGNAL with us. Contributions happen through assigned GitHub challenge issues so that two people do not unknowingly solve the same task.
+Welcome! An **issue** describes one task. A **branch** keeps your work separate. A **pull request (PR)** asks maintainers to review and merge your work.
 
-## Before you start
+## 1. Claim a task
 
-1. Read the README, the issue from beginning to end, and this guide.
-2. Comment `/claim` on an issue with `status:available`.
-3. Wait for a maintainer to assign it and change the status to `status:claimed`.
-4. Ask questions on the issue before widening its scope.
+1. Open the repository's **Issues** tab.
+2. Find an issue labelled `status:available`.
+3. Read its goal and checklist.
+4. Comment `/claim`.
+5. Wait until a maintainer assigns it to you.
 
-You may hold one core or advanced issue at a time. If there is no visible progress for 72 hours, maintainers may make it available again.
+For your first contribution, choose an issue labelled `good first issue`.
 
-## Local setup
+## 2. Fork and download the repository
+
+Click **Fork** on GitHub. Then clone your fork:
 
 ```bash
+git clone https://github.com/YOUR-USERNAME/Hacktoberfest26-WebDev-Challenges.git
+cd Hacktoberfest26-WebDev-Challenges
 npm ci
-cp .env.example .env
 npm run dev
 ```
 
-Mock mode is the default. Do not request shared provider credentials for ordinary development.
+Replace `YOUR-USERNAME` with your GitHub username. Visit [http://localhost:3000](http://localhost:3000) to confirm it works.
 
-## Branches and commits
+## 3. Create a branch
 
-Create a branch from the latest default branch:
+Use the challenge number from your issue:
 
 ```bash
 git switch -c challenge/SIG-001-priority-badge
 ```
 
-Use focused commits with useful messages, for example `feat(announcements): add priority badge`. Do not bundle refactors or formatting unrelated to your issue.
+Do not work directly on `main`.
 
-## Definition of done
+## 4. Make your change
 
-Your implementation must satisfy every acceptance criterion in the assigned issue and include its required evidence. Before opening a PR, run:
+- Implement only what the issue asks for.
+- Reuse the fake data in `src/data`.
+- Add or update a test when behavior changes.
+- Check keyboard controls as well as mouse controls.
+- Ask a question on the issue if anything is unclear.
+
+Useful commands:
 
 ```bash
-npm run check
+npm run dev      # start the website
+npm run test     # run tests
+npm run check    # run every required check
 ```
 
-Add tests at the lowest useful level. UI changes need screenshots or a short recording at desktop and mobile widths. Keyboard interactions must work without a mouse. Security- and privacy-sensitive changes need failure-path and redaction tests.
+## 5. Save and push your work
 
-## Pull requests
+```bash
+git add .
+git commit -m "feat: add announcement priority badge"
+git push -u origin challenge/SIG-001-priority-badge
+```
 
-- Link the issue using `Closes #123`.
-- Explain what changed and what you deliberately did not change.
-- Include test output and the evidence requested in the issue.
-- Disclose material AI assistance and be ready to explain every submitted line.
-- Never approve or merge your own PR.
-- Push review fixes to the same branch; do not open a replacement PR.
+Use a short commit message that explains what changed.
 
-## Data and privacy
+## 6. Open the pull request
 
-Only use repository fixtures or newly created synthetic data. Never put secrets, real email, real student data, or real complaint details in code, fixtures, screenshots, logs, test output, or PR descriptions. Report suspected exposure privately using [SECURITY.md](SECURITY.md).
+GitHub will show a **Compare & pull request** button after you push.
 
-## Reviews and conduct
+In the PR:
 
-Review the change, not the person. Be specific, kind, and patient with first-time contributors. All participation follows our [Code of Conduct](CODE_OF_CONDUCT.md).
+- write `Closes #ISSUE-NUMBER`;
+- explain what you changed;
+- include screenshots for visual changes;
+- say how you tested it;
+- mention which parts were influenced by AI tools, if any.
+
+Push review fixes to the same branch. You do not need to open another PR.
+
+## Before submitting
+
+- [ ] The assigned issue requirements are complete.
+- [ ] `npm run check` passes.
+- [ ] No unrelated files were changed.
+- [ ] No passwords, tokens, or real personal data were added.
+- [ ] Visual changes were checked on desktop and mobile.
+
+Be patient and kind during review. We care more about a clear, tested contribution than a large one.

@@ -1,36 +1,21 @@
-## Linked challenge
+## Issue
 
 Closes #<!-- issue number -->
 
-Challenge ID: `SIG-___`
+## What changed?
 
-## What changed
+<!-- Briefly explain your solution. -->
 
-<!-- Explain the user-visible or engineering outcome. Keep this focused on one issue. -->
+## How did you test it?
 
-## What is out of scope
+- [ ] `npm run check` passes
+- [ ] I tested visual changes on desktop and mobile
+- [ ] I used only fake data and added no secrets
 
-<!-- Name nearby work deliberately left for another issue. -->
+## Screenshots
 
-## Evidence
-
-- [ ] I added or updated tests required by the issue.
-- [ ] I ran `npm run check` locally.
-- [ ] I included screenshots or a recording for UI changes at desktop and mobile widths.
-- [ ] I verified keyboard interaction for UI changes.
-- [ ] I used synthetic data only and checked logs, screenshots, and test artifacts.
-
-Test output or evidence links:
-
-<!-- Paste concise output or drag files here. Never include private data. -->
+<!-- Add before/after images for visual changes. Delete this section if not needed. -->
 
 ## AI assistance
 
-- [ ] No material AI assistance was used.
-- [ ] Material AI assistance was used and is disclosed below.
-
-<!-- Name the tool and what it influenced. You must understand and be able to explain every submitted line. -->
-
-## Reviewer notes
-
-<!-- Call out privacy, security, migration, or follow-up concerns. -->
+<!-- Name the tool and what it helped with, or write "None". -->

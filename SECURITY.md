@@ -18,7 +18,7 @@ Include a concise description, reproduction steps, impact, and any suggested mit
 - Logs and metrics must exclude subjects, bodies, attachments, addresses, tokens, and identifying complaint content.
 - Disconnect and account deletion must revoke access where supported and remove locally stored credentials and derived private data.
 
-Copy `.env.example` to `.env` for local values. Every `.env*` file except the example is ignored. If a secret is committed, revoke it immediately; deleting it from a later commit is not enough.
+Local `.env` files are ignored by Git. If a secret is committed, revoke it immediately; deleting it from a later commit is not enough.
 
 ## Scope
 

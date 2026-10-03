@@ -1,83 +1,72 @@
-# SIGNAL — Hacktoberfest 2026 WebDev Challenges
+# SIGNAL — WebDev Challenges
 
-SIGNAL is one shared, student-focused product built through focused GitHub issues and pull requests. It makes important campus announcements easier to act on and everyday operational complaints easier to track.
+SIGNAL is one website built by many contributors during MU Enigma's Hacktoberfest 2026 event.
 
-This is **not a level-by-level submission repository**. You do not add work in a folder named after yourself. Contributors claim a feature issue, improve the shared application, and open a focused PR.
+The website will help students:
 
-## What we are building
+- find important announcements and deadlines from their email;
+- report everyday campus problems and track their status.
 
-### Announcements
+You do **not** need to build the whole website. Pick one GitHub issue and implement only that feature.
 
-SIGNAL turns announcement-style email into a clean, searchable feed. It will identify deadlines and required actions, group revisions, and let students save, snooze, or mark items handled. Microsoft Outlook is the first real provider; Gmail is an optional advanced adapter.
+## New contributor? Start here
 
-### Operational complaints
+1. Open the repository's **Issues** tab.
+2. Choose an issue labelled `status:available` and `good first issue`.
+3. Comment `/claim` and wait for a maintainer to assign it to you.
+4. Follow [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Students can report and track routine campus problems—Wi-Fi, water, electricity, washrooms, laundry, cleanliness, broken facilities, hostel maintenance, and queues. Moderators can review progress without exposing a reporter who chose public anonymity.
+Please do not start coding before the issue is assigned. This prevents two people from doing the same work.
 
-## Starting point
+## Run the project
 
-The repository intentionally starts small:
-
-- a Next.js and TypeScript application shell;
-- responsive placeholder routes for both product modules;
-- deterministic, synthetic mail and complaint fixtures;
-- mock mailbox mode as the credential-free default;
-- shared visual tokens and basic quality checks;
-- 36 scoped challenge specifications ready to publish as GitHub issues.
-
-The placeholders are not missing polish—they preserve meaningful work for contributors. Implement features only through an assigned issue.
-
-## Final goal
-
-SIGNAL v1 is complete when the announcement workflow, complaint workflow, Outlook connection, privacy protections, automated tests, CI, accessibility, documentation, and a synthetic-data public demo all work end to end. Mock mode plus Outlook is a successful release; Gmail must not block it.
-
-## Quick start
-
-Prerequisites: Node.js 22 and npm 11.
+You need [Node.js 20 or newer](https://nodejs.org/) and Git.
 
 ```bash
 git clone https://github.com/MU-Enigma/Hacktoberfest26-WebDev-Challenges.git
 cd Hacktoberfest26-WebDev-Challenges
-cp .env.example .env
 npm ci
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). No email account, OAuth app, or real student data is required. Keep `.env` local; it is ignored by Git.
+Open [http://localhost:3000](http://localhost:3000).
 
-Useful commands:
+The project starts with safe mock data. You do not need an Outlook account, Gmail account, password, or API key.
 
-| Command             | Purpose                      |
-| ------------------- | ---------------------------- |
-| `npm run dev`       | Start the local app          |
-| `npm run test`      | Run unit tests once          |
-| `npm run lint`      | Run ESLint                   |
-| `npm run typecheck` | Check TypeScript             |
-| `npm run format`    | Check formatting             |
-| `npm run build`     | Create the production build  |
-| `npm run check`     | Run every local verification |
+## Where should I look?
 
-## Contributing
+| Path | What it contains |
+|---|---|
+| `src/app` | Website pages and styles |
+| `src/components` | Reusable UI components |
+| `src/data` | Fake data used during development |
+| `CONTRIBUTING.md` | The complete beginner contribution guide |
 
-1. Browse the [open issues](https://github.com/MU-Enigma/Hacktoberfest26-WebDev-Challenges/issues) and choose one marked `status:available`.
-2. Comment `/claim` and wait for assignment.
-3. Create `challenge/SIG-###-short-name` from the latest default branch.
-4. Implement only the claimed scope and add the evidence requested by the issue.
-5. Run `npm run check` and open a PR linked to the issue.
-6. Disclose material AI assistance and respond to review on the same branch.
+Everything else is project setup. You usually will not need to change it.
 
-Claim only one core or advanced issue at a time. Show progress within 72 hours or let a maintainer release the issue. Read [CONTRIBUTING.md](CONTRIBUTING.md) before starting.
+## Check your work
 
-All Hacktoberfest submissions must be opened as pull requests by **31 October 2026**.
+Before opening a pull request, run:
 
-## Privacy boundary
+```bash
+npm run check
+```
 
-Use synthetic data only. Never commit mailbox tokens, passwords, raw personal email, real complaint details, or identifying student information. SIGNAL never sends, deletes, or modifies email, and it does not cover ERP/Juno, attendance, grades, placement, transport, payments, lost and found, or sensitive personal grievances. See [SECURITY.md](SECURITY.md).
+This runs linting, tests, and a production build—the same checks that run on GitHub.
 
-## For maintainers
+## Important rules
 
-The complete issue wording, labels, dependencies, staged release order, judging rubric, and safeguards live in [docs/CHALLENGES.md](docs/CHALLENGES.md). Follow [docs/MAINTAINER-LAUNCH.md](docs/MAINTAINER-LAUNCH.md) to publish the opening batch safely.
+- Work on one assigned issue at a time.
+- Keep your pull request focused on that issue.
+- Use only fake data from the repository.
+- Never commit passwords, tokens, real email, or real complaint information.
+- Mention material AI assistance in your pull request.
+- Ask questions on your issue whenever you are stuck.
 
-## License
+This is an MU Enigma community challenge. Hacktoberfest 2026 no longer counts pull requests toward official rewards, but we still use the issue and PR workflow to learn open-source collaboration.
 
-Code in this repository is available under the [MIT License](LICENSE).
+## Maintainers
+
+Contributors do not need to read the long challenge catalog. Organizers can find issue text and publishing instructions in [docs/CHALLENGES.md](docs/CHALLENGES.md).
+
+Licensed under the [MIT License](LICENSE).

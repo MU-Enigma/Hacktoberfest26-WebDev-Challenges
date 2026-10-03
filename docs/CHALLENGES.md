@@ -1,6 +1,8 @@
 # SIGNAL challenge catalog
 
-This is the maintainer source of truth for SIGNAL GitHub challenge issues. Contributors should claim the published GitHub issue rather than working directly from this file.
+> **Contributors do not need to read this file.** Choose a published GitHub issue and follow `CONTRIBUTING.md`. This catalog is only for organizers creating issues.
+
+Preview the opening batch with `npm run challenges:publish`. After checking the list, an organizer with GitHub CLI can add `-- --apply --repo MU-Enigma/Hacktoberfest26-WebDev-Challenges` to publish it. Later batches are named `contracts`, `stabilized`, and `final`.
 
 ## Product boundary
 
@@ -63,7 +65,7 @@ Gmail is an advanced parallel adapter. Its external OAuth verification is not re
 9. Never commit tokens, email data, passwords, or real complaint information.
 10. Do not approve or merge your own pull request.
 
-Every merged PR must pass formatting, linting, type checking, tests, accessibility checks where relevant, and the production build.
+Every merged PR must pass linting, tests, the production build, and accessibility checks where relevant.
 
 ## 4. Labels to create
 
@@ -534,7 +536,7 @@ Generate a private daily view of new announcements, approaching deadlines, and u
 
 _Labels:_ level:core, track:complaints, type:backend, size:m, release:required
 
-_Depends on:_ Maintainer database scaffold
+_Depends on:_ Repository scaffold
 
 ### Goal
 
@@ -883,7 +885,7 @@ Make background synchronization diagnosable without logging private mail.
 
 # Track E — Final quality and release challenges
 
-## SIG-401 — Create the required GitHub Actions CI pipeline
+## SIG-401 — Complete the GitHub Actions CI pipeline
 
 _Labels:_ level:core, track:quality, type:devops, size:l, release:required
 
@@ -891,7 +893,7 @@ _Depends on:_ Repository scaffold
 
 ### Goal
 
-Protect the shared repository with reliable, contributor-friendly checks.
+Extend the starter pipeline with every check needed for the final release.
 
 ### Acceptance criteria
 
@@ -963,7 +965,7 @@ Ship a credible v1 release and clearly credit individual contributors.
 ### Acceptance criteria
 
 - README explains the product, privacy boundary, mock setup, and provider status.
-- CONTRIBUTING.md, CODE_OF_CONDUCT.md, and SECURITY.md are complete.
+- README.md, CONTRIBUTING.md, and SECURITY.md are complete.
 - Deployment uses synthetic complaint and mailbox data.
 - Release notes link merged issues and contributors.
 - Demo covers announcements and complaints without exposing private data.

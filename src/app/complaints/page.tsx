@@ -1,5 +1,5 @@
 import { ModulePlaceholder } from "@/components/module-placeholder";
-import complaintFixtures from "@/data/fixtures/complaints.json";
+import { mockComplaints } from "@/data/mock-data";
 
 export default function ComplaintsPage() {
   return (
@@ -8,7 +8,7 @@ export default function ComplaintsPage() {
       title="Visible progress, protected reporters."
       description="Give routine campus maintenance problems a clear route from report to verified resolution."
       issueIds="SIG-201—208"
-      fixtureCount={complaintFixtures.length}
+      fixtureCount={mockComplaints.length}
     />
   );
 }

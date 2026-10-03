@@ -1,6 +1,85 @@
 import { spawnSync } from "node:child_process";
+import { readFile } from "node:fs/promises";
 
-import { readChallenges, selectBatch } from "./lib/challenges.mjs";
+const batches = {
+  opening: [
+    "SIG-001",
+    "SIG-002",
+    "SIG-003",
+    "SIG-004",
+    "SIG-005",
+    "SIG-006",
+    "SIG-007",
+    "SIG-008",
+    "SIG-101",
+    "SIG-102",
+    "SIG-201",
+    "SIG-401",
+  ],
+  contracts: [
+    "SIG-103",
+    "SIG-104",
+    "SIG-105",
+    "SIG-106",
+    "SIG-107",
+    "SIG-202",
+    "SIG-203",
+    "SIG-301",
+    "SIG-304",
+  ],
+  stabilized: [
+    "SIG-108",
+    "SIG-109",
+    "SIG-204",
+    "SIG-205",
+    "SIG-206",
+    "SIG-207",
+    "SIG-208",
+    "SIG-302",
+    "SIG-303",
+    "SIG-305",
+    "SIG-306",
+    "SIG-307",
+  ],
+  final: ["SIG-402", "SIG-403", "SIG-404"],
+};
+
+async function readChallenges() {
+  const markdown = await readFile("docs/CHALLENGES.md", "utf8");
+  const pattern =
+    /^## (SIG-\d{3}) — (.+)\r?\n([\s\S]*?)(?=\r?\n## SIG-\d{3}|\r?\n---\s*(?:\r?\n|$))/gm;
+  const challenges = [];
+
+  for (const match of markdown.matchAll(pattern)) {
+    const [, id, title, rawBody] = match;
+    const labelLine = rawBody.match(/^[*_]Labels:[*_]\s*(.+?)\s*$/m);
+    const labels = (labelLine?.[1] ?? "")
+      .split(",")
+      .map((label) => label.trim())
+      .filter(Boolean);
+    const body = rawBody
+      .replace(/^[*_]Labels:[*_].+(?:\r?\n)?/m, "")
+      .trim();
+
+    challenges.push({ id, title: title.trim(), labels, body });
+  }
+
+  if (challenges.length !== 36) {
+    throw new Error(`Expected 36 challenges, found ${challenges.length}.`);
+  }
+
+  return challenges;
+}
+
+function selectBatch(challenges, batch) {
+  if (batch === "all") return challenges;
+  if (!batches[batch]) {
+    throw new Error(`Unknown batch: ${batch}`);
+  }
+
+  const byId = new Map(challenges.map((challenge) => [challenge.id, challenge]));
+  return batches[batch].map((id) => byId.get(id));
+}
 
 const labelCatalog = {
   "level:starter": ["2DA44E", "Independent first contribution"],

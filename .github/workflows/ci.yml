@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Format, lint, types, tests, and catalog
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MAIL_PROVIDER: mock
+      DATABASE_URL: file:../data/ci.db
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Check formatting
+        run: npm run format
+      - name: Lint
+        run: npm run lint
+      - name: Check types
+        run: npm run typecheck
+      - name: Run unit tests
+        run: npm run test
+      - name: Validate challenge catalog
+        run: npm run challenges:validate
+      - name: Validate database schema
+        run: npm run db:validate
+
+  build:
+    name: Production build in mock mode
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MAIL_PROVIDER: mock
+      DATABASE_URL: file:../data/ci.db
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Build application
+        run: npm run build

@@ -1,0 +1,29 @@
+[
+  {
+    "fixtureId": "mail-001",
+    "providerMessageId": "synthetic-outlook-001",
+    "from": "student.affairs@example.edu",
+    "subject": "Course registration closes Friday",
+    "receivedAt": "2026-10-05T09:30:00.000Z",
+    "preview": "Complete registration before 5:00 PM on 9 October.",
+    "hasAttachments": false
+  },
+  {
+    "fixtureId": "mail-002",
+    "providerMessageId": "synthetic-outlook-002",
+    "from": "library@example.edu",
+    "subject": "Library hours during the mid-semester break",
+    "receivedAt": "2026-10-06T12:15:00.000Z",
+    "preview": "The library will use revised opening hours next week.",
+    "hasAttachments": true
+  },
+  {
+    "fixtureId": "mail-003",
+    "providerMessageId": "synthetic-outlook-003",
+    "from": "clubs@example.edu",
+    "subject": "Reminder: robotics orientation room updated",
+    "receivedAt": "2026-10-07T06:45:00.000Z",
+    "preview": "The orientation has moved from Room 204 to Seminar Hall B.",
+    "hasAttachments": false
+  }
+]

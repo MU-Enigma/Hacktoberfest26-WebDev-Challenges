@@ -1,0 +1,6 @@
+.next
+coverage
+node_modules
+package-lock.json
+Chats with webdev head
+demo_aiml_README.md

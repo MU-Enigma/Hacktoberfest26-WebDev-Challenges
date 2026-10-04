@@ -10,7 +10,7 @@ Welcome! An **issue** describes one task. A **branch** keeps your work separate.
 4. Comment `/claim`.
 5. Wait until a maintainer assigns it to you.
 
-For your first contribution, choose an issue labelled `good first issue`.
+For your first contribution, choose an issue labelled `easy` and `good first issue`.
 
 ## 2. Fork and download the repository
 
@@ -19,7 +19,7 @@ Click **Fork** on GitHub. Then clone your fork:
 ```bash
 git clone https://github.com/YOUR-USERNAME/Hacktoberfest26-WebDev-Challenges.git
 cd Hacktoberfest26-WebDev-Challenges
-npm ci
+npm install
 npm run dev
 ```
 

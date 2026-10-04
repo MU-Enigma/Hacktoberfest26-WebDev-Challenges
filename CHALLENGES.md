@@ -71,6 +71,13 @@ Every merged PR must pass linting, type checking, tests, and accessibility check
 
 ### Difficulty
 
+- easy â€” beginner-friendly, independent tasks
+- intermediate â€” tasks requiring some project experience
+- hard â€” complex integrations or multi-part features
+- expert â€” release-critical or specialist work
+
+Each issue also keeps its release-stage label:
+
 - level:starter
 - level:core
 - level:advanced

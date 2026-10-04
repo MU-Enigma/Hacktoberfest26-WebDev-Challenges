@@ -82,6 +82,10 @@ function selectBatch(challenges, batch) {
 }
 
 const labelCatalog = {
+  easy: ["2DA44E", "Beginner-friendly task"],
+  intermediate: ["0969DA", "Task requiring some project experience"],
+  hard: ["D97706", "Complex task with multiple moving parts"],
+  expert: ["B60205", "Release-critical or specialist task"],
   "level:starter": ["2DA44E", "Independent first contribution"],
   "level:core": ["0969DA", "Core product work"],
   "level:advanced": ["8250DF", "Advanced integration or architecture work"],
@@ -114,6 +118,38 @@ const labelCatalog = {
   "release:stretch": ["C2E0C6", "Useful but not required for SIGNAL v1"],
 };
 
+const difficultyByLevel = {
+  "level:starter": "easy",
+  "level:core": "intermediate",
+  "level:advanced": "hard",
+  "level:final": "expert",
+};
+
+function getDifficultyLabel(challenge) {
+  const matches = challenge.labels
+    .map((label) => difficultyByLevel[label])
+    .filter(Boolean);
+
+  if (matches.length !== 1) {
+    throw new Error(
+      `${challenge.id} must have exactly one level label to determine difficulty.`,
+    );
+  }
+
+  return matches[0];
+}
+
+function getInitialStatus(challenge, selectedBatch) {
+  if (
+    selectedBatch === "all" &&
+    !batches.opening.includes(challenge.id)
+  ) {
+    return "status:blocked";
+  }
+
+  return "status:available";
+}
+
 function getFlag(name, fallback) {
   const index = process.argv.indexOf(name);
   return index === -1 ? fallback : process.argv[index + 1];
@@ -141,7 +177,9 @@ if (!apply) {
     `Dry run: ${challenges.length} issues from the "${batch}" batch.`,
   );
   for (const challenge of challenges) {
-    console.log(`- [${challenge.id}] ${challenge.title}`);
+    console.log(
+      `- [${challenge.id}] ${challenge.title} (${getDifficultyLabel(challenge)})`,
+    );
   }
   console.log(
     "\nAdd --apply after reviewing this list. No GitHub changes were made.",
@@ -190,7 +228,11 @@ for (const challenge of challenges) {
     continue;
   }
 
-  const labels = [...challenge.labels, "status:available"];
+  const labels = [
+    ...challenge.labels,
+    getDifficultyLabel(challenge),
+    getInitialStatus(challenge, batch),
+  ];
   const args = [
     "issue",
     "create",

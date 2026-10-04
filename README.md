@@ -12,7 +12,7 @@ You do **not** need to build the whole website. Pick one GitHub issue and implem
 ## New contributor? Start here
 
 1. Open the repository's **Issues** tab.
-2. Choose an issue labelled `status:available` and `good first issue`.
+2. Choose an issue labelled `status:available`, `easy`, and `good first issue`.
 3. Comment `/claim` and wait for a maintainer to assign it to you.
 4. Follow [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -25,7 +25,7 @@ You need [Node.js 20 or newer](https://nodejs.org/) and Git.
 ```bash
 git clone https://github.com/MU-Enigma/Hacktoberfest26-WebDev-Challenges.git
 cd Hacktoberfest26-WebDev-Challenges
-npm ci
+npm install
 npm run dev
 ```
 

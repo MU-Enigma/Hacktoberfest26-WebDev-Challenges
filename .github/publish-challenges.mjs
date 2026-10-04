@@ -156,14 +156,43 @@ function getFlag(name, fallback) {
 }
 
 function runGh(args, { capture = false } = {}) {
-  const result = spawnSync("gh", args, {
-    encoding: "utf8",
-    stdio: capture ? ["ignore", "pipe", "inherit"] : "inherit",
-  });
+  const maxAttempts = 4;
 
-  if (result.error) throw result.error;
-  if (result.status !== 0) process.exit(result.status ?? 1);
-  return capture ? result.stdout : "";
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const result = spawnSync("gh", args, {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+
+    if (result.error) throw result.error;
+
+    if (result.status === 0) {
+      if (!capture && result.stdout) process.stdout.write(result.stdout);
+      if (result.stderr) process.stderr.write(result.stderr);
+      return capture ? result.stdout : "";
+    }
+
+    const errorOutput = `${result.stdout ?? ""}${result.stderr ?? ""}`;
+    const retryable =
+      /TLS handshake timeout|connection reset|timed out|502|503|EOF/i.test(
+        errorOutput,
+      );
+
+    if (!retryable || attempt === maxAttempts) {
+      process.stderr.write(errorOutput);
+      process.exit(result.status ?? 1);
+    }
+
+    console.warn(`GitHub request failed; retrying (${attempt}/${maxAttempts}).`);
+    Atomics.wait(
+      new Int32Array(new SharedArrayBuffer(4)),
+      0,
+      0,
+      attempt * 1000,
+    );
+  }
+
+  return "";
 }
 
 const batch = getFlag("--batch", "opening");
@@ -189,7 +218,17 @@ if (!apply) {
 
 runGh(["--version"]);
 
+const existingLabelsJson = runGh(
+  ["label", "list", "--limit", "100", "--json", "name", ...repoArgs],
+  { capture: true },
+);
+const existingLabels = new Set(
+  JSON.parse(existingLabelsJson).map((label) => label.name),
+);
+
 for (const [name, [color, description]] of Object.entries(labelCatalog)) {
+  if (existingLabels.has(name)) continue;
+
   runGh([
     "label",
     "create",
@@ -198,7 +237,6 @@ for (const [name, [color, description]] of Object.entries(labelCatalog)) {
     color,
     "--description",
     description,
-    "--force",
     ...repoArgs,
   ]);
 }

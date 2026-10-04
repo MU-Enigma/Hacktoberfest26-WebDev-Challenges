@@ -3,17 +3,17 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SIGNAL | Hacktoberfest 2026",
+  title: "SIGNAL | Campus workspace",
   description:
-    "A contributor-built campus announcements and operational complaints platform.",
+    "A focused workspace for campus announcements and operational complaints.",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="flex min-h-full flex-col">{children}</body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }

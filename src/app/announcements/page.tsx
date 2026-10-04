@@ -1,14 +1,33 @@
-import { ModulePlaceholder } from "@/components/module-placeholder";
-import { mockMail } from "@/data/mock-data";
+import { AppShell, UnderConstructionBoard } from "@/components/app-shell";
+
+const plannedFeatures = [
+  "Priority announcement feed",
+  "Deadline and action extraction",
+  "Search, filters, and saved items",
+  "Mailbox connection and sync",
+] as const;
 
 export default function AnnouncementsPage() {
   return (
-    <ModulePlaceholder
-      eyebrow="Module 01 / Announcements"
-      title="A clean feed begins here."
-      description="Normalize announcement-style email, identify what needs action, and keep the original mailbox read-only."
-      issueIds="SIG-101—109"
-      fixtureCount={mockMail.length}
-    />
+    <AppShell activePath="/announcements" pageLabel="Announcements">
+      <section className="page-heading module-heading">
+        <div>
+          <p className="overline">Module 01</p>
+          <h1>Announcements</h1>
+        </div>
+        <p className="heading-copy">
+          Important messages, clear deadlines, and required actions without the
+          noise of a full inbox.
+        </p>
+      </section>
+
+      <UnderConstructionBoard
+        code="ANNOUNCEMENT WORKSPACE / V0.1"
+        title="A calmer inbox is taking shape."
+        description="This area will turn relevant mailbox updates into a private, structured feed while keeping the original mailbox read-only."
+        items={plannedFeatures}
+        tone="blue"
+      />
+    </AppShell>
   );
 }

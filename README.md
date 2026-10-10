@@ -72,18 +72,179 @@ These rules apply to every contribution:
 
 Node.js 20.9 or newer is required.
 
-## Run the project locally
+## Contributor quick start
+
+Follow these steps to get a fresh clone running locally in mock mode.
+
+### Prerequisites
+
+Node.js 20.9.0 or newer is required.
+
+Check your installed versions:
+
+```bash
+node --version
+npm --version
+```
+
+### Get the repo
+
+Clone the repository and go into the project folder:
 
 ```bash
 git clone https://github.com/MU-Enigma/Hacktoberfest26-WebDev-Challenges.git
 cd Hacktoberfest26-WebDev-Challenges
+```
+
+### Install everything
+
+Install project dependencies:
+
+```bash
 npm install
+```
+
+You can also run `npm ci` for a clean install directly from `package-lock.json`.
+
+### Run mock mode
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Important: real OAuth credentials are NOT needed.
+You do not need an Outlook account, Gmail credentials, API keys, client secrets, or external services to run or test mock mode. There is no `.env` file required. SIGNAL boots directly in local mock mode using built-in synthetic records.
 
-The project runs entirely with local synthetic data. No environment file or external account is required for the starter application.
+### Check that it works
+
+1. Open your browser to:
+   http://localhost:3000
+
+2. In your terminal, Next.js will report ready:
+   Ready in ... ms
+
+3. On the homepage, verify:
+   - Data source shows "LOCAL"
+   - Announcements indexed shows "03"
+   - Open complaints shows "02"
+   - Clicking Announcements or Complaints in the sidebar loads the module boards.
+
+4. Run all checks to verify your setup passes linting, types, and unit tests:
+
+```bash
+npm run check
+```
+
+### Reset mock data
+
+All starter data in this project is stored directly in `src/data/mock-data.ts` as static TypeScript arrays (`mockMail` and `mockComplaints`). There is no separate database or cache.
+
+If you edited `src/data/mock-data.ts` while testing and want to get back to the clean starter data, discard your changes to that file:
+
+```bash
+git restore src/data/mock-data.ts
+```
+
+Or on older Git versions:
+
+```bash
+git checkout -- src/data/mock-data.ts
+```
+
+Run tests to confirm the default mock records are back:
+
+```bash
+npm test
+```
+
+### Troubleshooting
+
+#### Windows
+
+Problem:
+Running `npm run dev` in PowerShell fails with:
+`File ...\npm.ps1 cannot be loaded because running scripts is disabled on this system`
+
+Fix:
+Open PowerShell and run:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Or use Command Prompt (CMD) or Git Bash instead.
+
+Problem:
+`Port 3000 is in use, trying 3001 instead` or server cannot bind to port 3000.
+
+Fix:
+Run on another port:
+npm run dev -- -p 3001
+Or find and stop the process using port 3000:
+netstat -ano | findstr :3000
+taskkill /PID <PID> /F
+
+Problem:
+Git shows carriage return warnings like `LF will be replaced by CRLF`.
+
+Fix:
+Configure Git to handle line endings properly:
+git config core.autocrlf true
+
+#### macOS
+
+Problem:
+Port 3000 is occupied by macOS Control Center (AirPlay Receiver), shifting Next.js to port 3001.
+
+Fix:
+Turn off AirPlay Receiver in System Settings > General > AirDrop & AirPlay, or run on another port:
+npm run dev -- -p 3001
+
+Problem:
+Node version is older than 20.9.0 or command is missing (`node: command not found`).
+
+Fix:
+Install or upgrade to Node 20 LTS using Homebrew or nvm:
+brew install node
+or
+nvm install 20 && nvm use 20
+
+Problem:
+Permission errors during `npm install` (`EACCES: permission denied`).
+
+Fix:
+Fix npm cache ownership (do not run npm with sudo):
+sudo chown -R $(whoami) ~/.npm
+
+#### Linux
+
+Problem:
+System package manager installed an outdated Node version, or `node: command not found`.
+
+Fix:
+Install Node 20 or newer using nvm:
+nvm install 20
+
+Problem:
+Node is installed with nvm, but not recognized in the current shell session.
+
+Fix:
+Activate Node in your session:
+nvm use 20
+
+Problem:
+Port 3000 is already in use by another service.
+
+Fix:
+Run on another port:
+npm run dev -- -p 3001
+Or stop the process holding port 3000:
+fuser -k 3000/tcp
+
+Problem:
+Permission denied when writing to `node_modules` (`EACCES: permission denied`).
+
+Fix:
+Ensure your user owns the project folder:
+sudo chown -R $(whoami) .
 
 ## Repository guide
 

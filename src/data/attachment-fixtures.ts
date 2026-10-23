@@ -1,11 +1,5 @@
-export interface MailAttachment {
-  id: string;
-  filename: string;
-  mimeType: string;
-  sizeBytes: number;
-  url?: string;
-}
-
+import type { MailAttachment } from "@/mail/contracts";
+export type { MailAttachment } from "@/mail/contracts";
 export const attachmentFixtures: readonly MailAttachment[] = [
   {
     id: "att-pdf-001",

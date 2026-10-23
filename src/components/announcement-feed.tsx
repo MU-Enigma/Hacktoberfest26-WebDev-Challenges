@@ -2,20 +2,8 @@
 
 import React from "react";
 
-export type AnnouncementPriority =
-  | "urgent"
-  | "action_required"
-  | "upcoming"
-  | "informational";
-
-export type Announcement = {
-  id: string;
-  from: string;
-  subject: string;
-  receivedAt: string;
-  preview: string;
-  priority?: AnnouncementPriority;
-};
+import type { Announcement, AnnouncementPriority } from "@/mail/contracts";
+export type { Announcement, AnnouncementPriority } from "@/mail/contracts";
 
 export type AnnouncementFeedStatus = "loading" | "empty" | "error" | "ready";
 

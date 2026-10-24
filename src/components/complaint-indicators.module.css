@@ -1,0 +1,61 @@
+.indicator {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.25em 0.6em;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  vertical-align: middle;
+}
+
+.symbol {
+  flex: none;
+}
+
+.neutral {
+  background: #eeeeee;
+  color: #333333;
+}
+
+.pending {
+  background: #fff2c6;
+  color: #5a3900;
+}
+
+.active {
+  background: #e4efff;
+  color: #002f6c;
+}
+
+.success {
+  background: #e0f5e7;
+  color: #064b2a;
+}
+
+.closed {
+  background: #efe8fa;
+  color: #3c285f;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (forced-colors: active) {
+  .indicator {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}

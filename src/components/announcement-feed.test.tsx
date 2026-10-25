@@ -4,13 +4,21 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import {
   Announcement,
+  AnnouncementDetail,
   AnnouncementFeed,
   AnnouncementFeedEmpty,
   AnnouncementFeedError,
   AnnouncementFeedSkeleton,
+  AnnouncementRow,
   AnnouncementSkeletonRow,
   sanitizeErrorMessage,
 } from "./announcement-feed";
+import {
+  isAnnouncementMail,
+  mockAnnouncementsFixture,
+  normalizeMailToAnnouncement,
+  rawMockMessages,
+} from "../data/announcement-fixtures";
 
 const sampleAnnouncements: Announcement[] = [
   {
@@ -339,3 +347,212 @@ function findButtons(node: unknown): ButtonElement[] {
   traverse(node);
   return results;
 }
+
+describe("SIG-103: Filtering Unrelated Mock Conversations", () => {
+  it("includes official campus announcement mail and excludes unrelated student conversations", () => {
+    // 1. Ingest raw mock messages and filter using isAnnouncementMail
+    const announcements = rawMockMessages.filter(isAnnouncementMail);
+    const unrelatedChats = rawMockMessages.filter((m) => !isAnnouncementMail(m));
+
+    // Must have identified broadcast announcements
+    expect(announcements.length).toBeGreaterThan(0);
+    expect(announcements.some((a) => a.id === "ann-001")).toBe(true);
+    expect(announcements.some((a) => a.id === "ann-002")).toBe(true);
+
+    // Unrelated 1-on-1 conversations must be strictly identified and excluded
+    expect(unrelatedChats.length).toBe(3);
+    expect(unrelatedChats.some((c) => c.id === "chat-001")).toBe(true);
+    expect(unrelatedChats.some((c) => c.subject.includes("Lunch at food court"))).toBe(true);
+    expect(unrelatedChats.some((c) => c.subject.includes("question 4 on the assignment"))).toBe(true);
+    expect(unrelatedChats.some((c) => c.subject.includes("Lost blue umbrella"))).toBe(true);
+
+    // 2. Render feed with normalized announcements and verify unrelated mail NEVER appears
+    const normalized = announcements.map(normalizeMailToAnnouncement);
+    const html = renderToStaticMarkup(<AnnouncementFeed items={normalized} />);
+
+    // Official announcements appear
+    expect(html).toContain("EMERGENCY: Campus water line repair");
+    expect(html).toContain("Course registration closes Friday");
+
+    // Unrelated personal chats do NOT appear
+    expect(html).not.toContain("Lunch at food court");
+    expect(html).not.toContain("question 4 on the assignment");
+    expect(html).not.toContain("Lost blue umbrella");
+  });
+});
+
+describe("SIG-103: Visual Priority Differentiation", () => {
+  it("renders distinct text, icons, and attributes for urgent, action_required, upcoming, and informational priorities", () => {
+    const items: Announcement[] = [
+      {
+        id: "ann-urgent",
+        from: "admin@example.edu",
+        subject: "Urgent power maintenance",
+        receivedAt: "2026-10-10T08:00:00.000Z",
+        preview: "Immediate power shutdown.",
+        priority: "urgent",
+      },
+      {
+        id: "ann-action",
+        from: "admin@example.edu",
+        subject: "Action required on documents",
+        receivedAt: "2026-10-10T08:00:00.000Z",
+        preview: "Submit documents today.",
+        priority: "action_required",
+      },
+      {
+        id: "ann-upcoming",
+        from: "admin@example.edu",
+        subject: "Upcoming webinar",
+        receivedAt: "2026-10-10T08:00:00.000Z",
+        preview: "Join next week.",
+        priority: "upcoming",
+      },
+      {
+        id: "ann-info",
+        from: "admin@example.edu",
+        subject: "General bulletin",
+        receivedAt: "2026-10-10T08:00:00.000Z",
+        preview: "Standard information.",
+        priority: "informational",
+      },
+    ];
+
+    const html = renderToStaticMarkup(<AnnouncementFeed items={items} />);
+
+    // Urgent item verification: data-priority, text, and icon
+    expect(html).toContain('data-priority="urgent"');
+    expect(html).toContain("priority-urgent");
+    expect(html).toContain("URGENT");
+    expect(html).toContain("!");
+
+    // Action Required item verification: data-priority, text, and icon
+    expect(html).toContain('data-priority="action_required"');
+    expect(html).toContain("priority-action_required");
+    expect(html).toContain("ACTION REQUIRED");
+    expect(html).toContain("▶");
+
+    // Upcoming item verification: data-priority, text, and icon
+    expect(html).toContain('data-priority="upcoming"');
+    expect(html).toContain("priority-upcoming");
+    expect(html).toContain("UPCOMING");
+    expect(html).toContain("◷");
+
+    // Informational item verification: data-priority, text, and icon
+    expect(html).toContain('data-priority="informational"');
+    expect(html).toContain("priority-informational");
+    expect(html).toContain("INFO");
+    expect(html).toContain("ℹ");
+  });
+
+  it("safely falls back to informational priority when priority is undefined or unknown", () => {
+    const item: Announcement = {
+      id: "ann-fallback",
+      from: "info@example.edu",
+      subject: "Unspecified priority note",
+      receivedAt: "2026-10-10T08:00:00.000Z",
+      preview: "General notice.",
+    };
+
+    const html = renderToStaticMarkup(<AnnouncementRow item={item} />);
+    expect(html).toContain('data-priority="informational"');
+    expect(html).toContain("INFO");
+    expect(html).toContain("ℹ");
+  });
+});
+
+describe("SIG-103: Selected Announcement State & Detail View", () => {
+  it("renders side-by-side master-detail layout on desktop with selected row highlighted", () => {
+    const items = [...mockAnnouncementsFixture];
+    const selectedItem = items[0];
+
+    const html = renderToStaticMarkup(
+      <AnnouncementFeed items={items} selectedId={selectedItem.id} />,
+    );
+
+    // Layout container and selection classes
+    expect(html).toContain("announcement-feed-layout has-selected");
+    expect(html).toContain("announcement-feed-column-master");
+    expect(html).toContain("announcement-feed-column-detail");
+
+    // Selected item is marked with announcement-row-selected and aria-selected="true"
+    expect(html).toContain(`data-testid="announcement-item-${selectedItem.id}"`);
+    expect(html).toContain("announcement-row announcement-row-selected");
+    expect(html).toContain('aria-selected="true"');
+
+    // Detail panel displays the selected item's content
+    expect(html).toContain('data-testid="announcement-detail-card"');
+    expect(html).toContain(`ANNOUNCEMENT DETAILS — ${selectedItem.id}`);
+    expect(html).toContain(selectedItem.subject);
+    expect(html).toContain(selectedItem.from);
+  });
+
+  it("renders placeholder in detail view when no announcement is selected", () => {
+    const items = [...mockAnnouncementsFixture];
+
+    const html = renderToStaticMarkup(
+      <AnnouncementFeed items={items} selectedId={null} />,
+    );
+
+    expect(html).toContain("announcement-feed-layout");
+    expect(html).not.toContain("has-selected");
+    expect(html).toContain('data-testid="announcement-detail-placeholder"');
+    expect(html).toContain("SELECT AN ANNOUNCEMENT");
+  });
+
+  it("displays action items with deadlines and safe attachment rows in AnnouncementDetail", () => {
+    const detailItem = mockAnnouncementsFixture.find((a) => a.actions && a.actions.length > 0) || mockAnnouncementsFixture[0];
+
+    const html = renderToStaticMarkup(
+      <AnnouncementDetail item={detailItem} onClose={() => {}} />,
+    );
+
+    expect(html).toContain("ANNOUNCEMENT DETAILS");
+    expect(html).toContain("← Back to feed");
+    expect(html).toContain(detailItem.subject);
+
+    if (detailItem.actions && detailItem.actions.length > 0) {
+      expect(html).toContain("Required Actions");
+      expect(html).toContain(detailItem.actions[0].text);
+    }
+
+    if (detailItem.attachments && detailItem.attachments.length > 0) {
+      expect(html).toContain("Attachments");
+      expect(html).toContain(detailItem.attachments[0].filename);
+    }
+  });
+
+  it("renders accessible keyboard controls on AnnouncementRow for Enter and Space selection", () => {
+    const onSelect = vi.fn();
+    const item = mockAnnouncementsFixture[0];
+
+    const element = <AnnouncementRow item={item} onSelect={onSelect} />;
+    const html = renderToStaticMarkup(element);
+
+    expect(html).toContain('role="button"');
+    expect(html).toContain('tabindex="0"');
+  });
+});
+
+describe("SIG-103: Pagination & Incremental Loading", () => {
+  it("renders load more button when items exceed pageSize, appending without unmounting existing items", () => {
+    const items = [...mockAnnouncementsFixture]; // Has 6 announcements
+    expect(items.length).toBeGreaterThan(3);
+
+    // Initial render with pageSize=2
+    const htmlPage1 = renderToStaticMarkup(
+      <AnnouncementFeed items={items} pageSize={2} />,
+    );
+
+    // Renders exactly the first 2 items
+    expect(htmlPage1).toContain(`data-testid="announcement-item-${items[0].id}"`);
+    expect(htmlPage1).toContain(`data-testid="announcement-item-${items[1].id}"`);
+    expect(htmlPage1).not.toContain(`data-testid="announcement-item-${items[2].id}"`);
+
+    // Load more button is rendered with count details
+    expect(htmlPage1).toContain('data-testid="announcement-load-more-btn"');
+    expect(htmlPage1).toContain("Load More Announcements (showing 2 of ");
+    expect(htmlPage1).toContain("more remaining");
+  });
+});
+

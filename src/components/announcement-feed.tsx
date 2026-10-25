@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
-import type { Announcement, AnnouncementPriority } from "@/mail/contracts";
-export type { Announcement, AnnouncementPriority } from "@/mail/contracts";
+import type { Announcement, AnnouncementPriority } from "../mail/contracts";
+export type { Announcement, AnnouncementPriority } from "../mail/contracts";
+import { AttachmentRow } from "./attachment-row";
+import { formatRelativeTime } from "../utils/date-time";
 
 export type AnnouncementFeedStatus = "loading" | "empty" | "error" | "ready";
 
@@ -388,29 +390,60 @@ export function AnnouncementFeedError({
 
 export type AnnouncementRowProps = {
   item: Announcement;
+  isSelected?: boolean;
+  onSelect?: () => void;
   className?: string;
 };
 
 /**
  * Individual announcement row for displaying loaded messages.
+ * Uses distinctive badges (with both icon and text) and accent borders so
+ * urgent and action-required items are immediately distinguishable without relying on color alone.
  */
-export function AnnouncementRow({ item, className }: AnnouncementRowProps) {
+export function AnnouncementRow({
+  item,
+  isSelected = false,
+  onSelect,
+  className,
+}: AnnouncementRowProps) {
   const priority = item.priority || "informational";
-  const priorityLabels: Record<AnnouncementPriority, string> = {
-    urgent: "URGENT",
-    action_required: "ACTION REQUIRED",
-    upcoming: "UPCOMING",
-    informational: "INFO",
+  const priorityConfig: Record<
+    AnnouncementPriority,
+    { label: string; icon: string }
+  > = {
+    urgent: { label: "URGENT", icon: "!" },
+    action_required: { label: "ACTION REQUIRED", icon: "▶" },
+    upcoming: { label: "UPCOMING", icon: "◷" },
+    informational: { label: "INFO", icon: "ℹ" },
+  };
+
+  const { label, icon } = priorityConfig[priority] || priorityConfig.informational;
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.key === "Enter" || e.key === " ") && onSelect) {
+      e.preventDefault();
+      onSelect();
+    }
   };
 
   return (
     <article
-      className={`announcement-row ${className || ""}`}
+      className={`announcement-row ${isSelected ? "announcement-row-selected" : ""} ${className || ""}`}
       data-testid={`announcement-item-${item.id}`}
+      data-priority={priority}
+      role={onSelect ? "button" : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      aria-selected={isSelected}
+      onClick={onSelect}
+      onKeyDown={onSelect ? handleKeyDown : undefined}
     >
       <div className="announcement-row-header">
-        <span className={`announcement-badge priority-${priority}`}>
-          {priorityLabels[priority]}
+        <span
+          className={`announcement-badge priority-${priority}`}
+          data-priority={priority}
+        >
+          <span className="badge-icon" aria-hidden="true">{icon}</span>
+          <span>{label}</span>
         </span>
         <span className="announcement-sender" title={item.from}>
           {item.from}
@@ -424,13 +457,159 @@ export function AnnouncementRow({ item, className }: AnnouncementRowProps) {
       </div>
       <h3 className="announcement-subject">{item.subject}</h3>
       <p className="announcement-preview">{item.preview}</p>
+      <div className="announcement-row-meta">
+        {item.category && (
+          <span className="announcement-meta-tag">{item.category}</span>
+        )}
+        {item.actions && item.actions.length > 0 && (
+          <span className="announcement-meta-tag tag-action">
+            ⚡ Action required
+          </span>
+        )}
+        {item.attachments && item.attachments.length > 0 && (
+          <span className="announcement-meta-tag tag-attachment">
+            📎 {item.attachments.length} {item.attachments.length === 1 ? "attachment" : "attachments"}
+          </span>
+        )}
+      </div>
     </article>
+  );
+}
+
+export type AnnouncementDetailProps = {
+  item: Announcement | null;
+  onClose?: () => void;
+  className?: string;
+};
+
+/**
+ * Detailed announcement view displaying complete message body, deadlines, and attachments.
+ */
+export function AnnouncementDetail({
+  item,
+  onClose,
+  className,
+}: AnnouncementDetailProps) {
+  if (!item) {
+    return (
+      <aside
+        className={`announcement-detail-placeholder ${className || ""}`}
+        data-testid="announcement-detail-placeholder"
+      >
+        <span className="announcement-detail-placeholder-icon" aria-hidden="true">
+          📋
+        </span>
+        <h3>SELECT AN ANNOUNCEMENT</h3>
+        <p>
+          Select an announcement from the feed to view full details, deadlines,
+          and safe attachments.
+        </p>
+      </aside>
+    );
+  }
+
+  const priority = item.priority || "informational";
+  const priorityLabels: Record<AnnouncementPriority, string> = {
+    urgent: "URGENT",
+    action_required: "ACTION REQUIRED",
+    upcoming: "UPCOMING",
+    informational: "INFO",
+  };
+
+  let relativeTimeStr = "";
+  try {
+    relativeTimeStr = formatRelativeTime(item.receivedAt);
+  } catch {
+    relativeTimeStr = new Date(item.receivedAt).toLocaleDateString();
+  }
+
+  return (
+    <aside
+      className={`announcement-detail-card ${className || ""}`}
+      data-testid="announcement-detail-card"
+      aria-label={`Details for announcement: ${item.subject}`}
+    >
+      <div className="announcement-detail-titlebar">
+        <span>ANNOUNCEMENT DETAILS — {item.id}</span>
+        {onClose && (
+          <button
+            type="button"
+            className="announcement-detail-close-btn"
+            onClick={onClose}
+            aria-label="Back to announcements list"
+          >
+            ← Back to feed
+          </button>
+        )}
+      </div>
+
+      <div className="announcement-detail-content">
+        <div className="announcement-detail-header-row">
+          <span className={`announcement-badge priority-${priority}`}>
+            {priorityLabels[priority]}
+          </span>
+          {item.category && (
+            <span className="announcement-meta-tag">{item.category}</span>
+          )}
+          <span className="announcement-detail-time" title={item.receivedAt}>
+            {relativeTimeStr}
+          </span>
+        </div>
+
+        <div className="announcement-detail-sender">
+          <strong>From:</strong> {item.from}
+        </div>
+
+        <h2 className="announcement-detail-subject">{item.subject}</h2>
+
+        {item.actions && item.actions.length > 0 && (
+          <div className="announcement-action-callout" data-testid="announcement-actions-box">
+            <h4>⚡ Required Actions</h4>
+            {item.actions.map((act) => (
+              <div key={act.id} className="announcement-action-item">
+                <p>{act.text}</p>
+                {act.deadline && (
+                  <span className="announcement-action-deadline">
+                    Due: {act.deadline}
+                  </span>
+                )}
+                {act.needsConfirmation && (
+                  <span className="announcement-meta-tag tag-action">
+                    Confirmation required
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="announcement-detail-body">
+          {item.body || item.preview}
+        </div>
+
+        {item.attachments && item.attachments.length > 0 && (
+          <div className="announcement-detail-attachments-box">
+            <h4 className="announcement-detail-attachments-title">
+              Attachments ({item.attachments.length})
+            </h4>
+            <div className="announcement-attachments-list" role="list">
+              {item.attachments.map((att) => (
+                <AttachmentRow key={att.id} attachment={att} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </aside>
   );
 }
 
 export type AnnouncementFeedProps = {
   status?: AnnouncementFeedStatus;
   items?: readonly Announcement[];
+  selectedId?: string | null;
+  onSelectAnnouncement?: (announcement: Announcement | null) => void;
+  pageSize?: number;
   error?: unknown;
   onRetry?: () => void;
   onLoadMockMailbox?: () => void;
@@ -442,11 +621,15 @@ export type AnnouncementFeedProps = {
 
 /**
  * Main Announcement Feed component coordinating Loading, Empty, Error, and Loaded states.
- * Provides accessible status updates via ARIA live regions and adheres to zero layout shift.
+ * Provides accessible status updates via ARIA live regions, master-detail selection,
+ * scroll-preserving pagination, and responsive layout.
  */
 export function AnnouncementFeed({
   status: explicitStatus,
   items = [],
+  selectedId: controlledSelectedId,
+  onSelectAnnouncement,
+  pageSize = 5,
   error,
   onRetry,
   onLoadMockMailbox,
@@ -455,6 +638,12 @@ export function AnnouncementFeed({
   className,
   autoFocusRetry,
 }: AnnouncementFeedProps) {
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState<number>(pageSize);
+
+  const selectedId = controlledSelectedId !== undefined ? controlledSelectedId : internalSelectedId;
+  const selectedItem = items.find((i) => i.id === selectedId) || null;
+
   // Determine effective status
   let effectiveStatus: AnnouncementFeedStatus = "ready";
 
@@ -478,6 +667,30 @@ export function AnnouncementFeed({
   } else {
     screenReaderMessage = `${items.length} announcement${items.length === 1 ? "" : "s"} loaded.`;
   }
+
+  const handleSelect = (item: Announcement) => {
+    if (onSelectAnnouncement) {
+      onSelectAnnouncement(item);
+    } else {
+      setInternalSelectedId(item.id);
+    }
+  };
+
+  const handleCloseDetail = () => {
+    if (onSelectAnnouncement) {
+      onSelectAnnouncement(null);
+    } else {
+      setInternalSelectedId(null);
+    }
+  };
+
+  const handleLoadMore = () => {
+    // Appends the next batch of items to the list, strictly preserving scroll position in the DOM
+    setVisibleCount((prev) => prev + pageSize);
+  };
+
+  const visibleItems = items.slice(0, visibleCount);
+  const hasMore = items.length > visibleCount;
 
   return (
     <div
@@ -517,10 +730,46 @@ export function AnnouncementFeed({
       )}
 
       {effectiveStatus === "ready" && items.length > 0 && (
-        <div className="announcement-list" data-testid="announcement-list">
-          {items.map((item) => (
-            <AnnouncementRow item={item} key={item.id} />
-          ))}
+        <div
+          className={`announcement-feed-layout ${selectedItem ? "has-selected" : ""}`}
+          data-testid="announcement-feed-layout"
+        >
+          <div className="announcement-feed-column-master">
+            <div className="announcement-list" data-testid="announcement-list">
+              {visibleItems.map((item) => (
+                <AnnouncementRow
+                  item={item}
+                  key={item.id}
+                  isSelected={item.id === selectedId}
+                  onSelect={() => handleSelect(item)}
+                />
+              ))}
+            </div>
+
+            {hasMore && (
+              <div className="announcement-pagination">
+                <button
+                  type="button"
+                  className="classic-button announcement-load-more-btn"
+                  onClick={handleLoadMore}
+                  data-testid="announcement-load-more-btn"
+                  aria-label={`Load more announcements, currently showing ${visibleItems.length} of ${items.length}`}
+                >
+                  Load More Announcements (showing {visibleItems.length} of {items.length})
+                </button>
+                <span className="announcement-pagination-info">
+                  {items.length - visibleItems.length} more remaining
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="announcement-feed-column-detail">
+            <AnnouncementDetail
+              item={selectedItem}
+              onClose={handleCloseDetail}
+            />
+          </div>
         </div>
       )}
     </div>

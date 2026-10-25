@@ -1,4 +1,4 @@
-import type { ActionItem, Announcement, MailMessage } from "@/mail/contracts";
+import type { ActionItem, Announcement, MailMessage } from "../mail/contracts";
 import { attachmentFixtures } from "./attachment-fixtures";
 
 /**

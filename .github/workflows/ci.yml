@@ -5,15 +5,36 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
-    name: Lint, test, and build
+    name: Lint, types, and unit tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CI: true
+      TZ: UTC
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm run check
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Lint
+        run: npm run lint
+      - name: Check TypeScript types
+        run: npm run typecheck
+      - name: Run unit tests with synthetic fixtures
+        run: npm test -- --reporter=default

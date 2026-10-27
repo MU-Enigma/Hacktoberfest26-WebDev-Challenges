@@ -1,16 +1,6 @@
 import styles from "./complaint-indicators.module.css";
 
-const categories = {
-  wifi: "Wi-Fi",
-  water: "Water",
-  electricity: "Electricity",
-  washrooms: "Washrooms",
-  laundry: "Laundry",
-  cleanliness: "Cleanliness",
-  broken_facility: "Broken facility",
-  hostel_maintenance: "Hostel maintenance",
-  queues: "Queues",
-} as const;
+import { complaintCategories as categories } from "../complaints/domain";
 
 type Tone = "neutral" | "pending" | "active" | "success" | "closed";
 type StatusIndicator = { label: string; symbol: string; tone: Tone };

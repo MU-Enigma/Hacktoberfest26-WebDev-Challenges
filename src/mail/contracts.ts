@@ -34,6 +34,8 @@ export interface Announcement {
   priority?: AnnouncementPriority;
   category?: string;
   actions?: readonly ActionItem[];
+  body?: string;
+  attachments?: readonly MailAttachment[];
 }
 export interface MailPage {
   messages: readonly MailMessage[];

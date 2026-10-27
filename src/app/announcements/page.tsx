@@ -7,31 +7,35 @@ import {
   Announcement,
   AnnouncementFeed,
 } from "@/components/announcement-feed";
-import { mockMail } from "@/data/mock-data";
-
-function createMockAnnouncements(): Announcement[] {
-  const priorities: Announcement["priority"][] = [
-    "action_required",
-    "informational",
-    "upcoming",
-  ];
-  return mockMail.map((m, index) => ({
-    id: m.id,
-    from: m.from,
-    subject: m.subject,
-    receivedAt: m.receivedAt,
-    preview: m.preview,
-    priority: priorities[index % priorities.length],
-  }));
-}
+import {
+  isAnnouncementMail,
+  mockAnnouncementsFixture,
+  normalizeMailToAnnouncement,
+  rawMockMessages,
+} from "@/data/announcement-fixtures";
 
 export default function AnnouncementsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [items, setItems] = useState<Announcement[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("id") || null;
+    }
+    return null;
+  });
   const [error, setError] = useState<unknown>(null);
 
   // Initial check on mount: brief loading skeleton settling on simulated or empty state
   useEffect(() => {
+    const handlePopState = () => {
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        setSelectedId(params.get("id") || null);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+
     const timer = setTimeout(() => {
       if (typeof window !== "undefined") {
         const params = new URLSearchParams(window.location.search);
@@ -53,7 +57,11 @@ export default function AnnouncementsPage() {
           return;
         }
         if (simulate === "ready") {
-          setItems(createMockAnnouncements());
+          // Ingest raw mail messages, filtering out unrelated conversations
+          const announcementMail = rawMockMessages
+            .filter(isAnnouncementMail)
+            .map(normalizeMailToAnnouncement);
+          setItems(announcementMail);
           setIsLoading(false);
           return;
         }
@@ -62,16 +70,37 @@ export default function AnnouncementsPage() {
       setIsLoading(false);
     }, 600);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("popstate", handlePopState);
+    };
   }, []);
+
+  const handleSelectAnnouncement = (announcement: Announcement | null) => {
+    const nextId = announcement ? announcement.id : null;
+    setSelectedId(nextId);
+
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (nextId) {
+        url.searchParams.set("id", nextId);
+      } else {
+        url.searchParams.delete("id");
+      }
+      window.history.replaceState({}, "", url.toString());
+    }
+  };
 
   const handleLoadMockMailbox = () => {
     setIsLoading(true);
     setError(null);
 
-    // Simulate loading synthetic mock mailbox records
+    // Filter raw messages so announcement mail appears, while unrelated mock conversations do not
     setTimeout(() => {
-      setItems(createMockAnnouncements());
+      const announcementMail = rawMockMessages
+        .filter(isAnnouncementMail)
+        .map(normalizeMailToAnnouncement);
+      setItems(announcementMail.length > 0 ? announcementMail : [...mockAnnouncementsFixture]);
       setIsLoading(false);
     }, 500);
   };
@@ -82,7 +111,11 @@ export default function AnnouncementsPage() {
 
     // If error was simulated via query parameter, clear the parameter on retry
     if (typeof window !== "undefined" && window.location.search) {
-      window.history.replaceState({}, "", window.location.pathname);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("simulate");
+      url.searchParams.delete("state");
+      url.searchParams.delete("error");
+      window.history.replaceState({}, "", url.toString());
     }
 
     // Simulate retrying synchronization
@@ -132,6 +165,9 @@ export default function AnnouncementsPage() {
         <AnnouncementFeed
           status={isLoading ? "loading" : error ? "error" : items.length === 0 ? "empty" : "ready"}
           items={items}
+          selectedId={selectedId}
+          onSelectAnnouncement={handleSelectAnnouncement}
+          pageSize={5}
           error={error}
           onRetry={handleRetry}
           onLoadMockMailbox={handleLoadMockMailbox}

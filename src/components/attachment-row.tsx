@@ -1,5 +1,5 @@
-import type { MailAttachment } from "@/data/attachment-fixtures";
-import { formatBytes, getSafeFileType } from "@/utils/attachment-utils";
+import type { MailAttachment } from "../data/attachment-fixtures";
+import { formatBytes, getSafeFileType } from "../utils/attachment-utils";
 
 type AttachmentRowProps = {
   attachment: MailAttachment;

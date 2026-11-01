@@ -1387,6 +1387,9 @@ a {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+  transition: filter 0.15s ease, box-shadow 0.15s ease;
+  vertical-align: middle;
 }
 
 .announcement-badge.priority-urgent {
@@ -1411,6 +1414,42 @@ a {
   background: #505050;
   color: #fff;
   border-color: #2b2b2b;
+}
+
+/* Hover, focus, and interactive state behavior */
+.announcement-badge-interactive {
+  cursor: pointer;
+  user-select: none;
+}
+
+.announcement-badge:hover,
+.announcement-badge-interactive:hover {
+  filter: brightness(1.15);
+}
+
+.announcement-badge:focus-visible,
+.announcement-badge-interactive:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--navy, #000080);
+}
+
+.announcement-badge:active,
+.announcement-badge-interactive:active {
+  filter: brightness(0.95);
+  transform: translateY(1px);
+}
+
+@media (forced-colors: active) {
+  .announcement-badge {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+  .announcement-badge:focus-visible,
+  .announcement-badge-interactive:focus-visible {
+    outline: 2px solid Highlight;
+  }
 }
 
 .announcement-sender {

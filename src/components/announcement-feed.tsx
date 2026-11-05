@@ -2,10 +2,18 @@
 
 import React, { useState } from "react";
 
-import type { Announcement, AnnouncementPriority } from "../mail/contracts";
 export type { Announcement, AnnouncementPriority } from "../mail/contracts";
+import type { Announcement } from "../mail/contracts";
 import { AttachmentRow } from "./attachment-row";
 import { formatRelativeTime } from "../utils/date-time";
+import {
+  AnnouncementPriorityBadge,
+  resolvePriority,
+} from "./announcement-priority-badge";
+export {
+  AnnouncementPriorityBadge,
+  AnnouncementBadge,
+} from "./announcement-priority-badge";
 
 export type AnnouncementFeedStatus = "loading" | "empty" | "error" | "ready";
 
@@ -406,18 +414,7 @@ export function AnnouncementRow({
   onSelect,
   className,
 }: AnnouncementRowProps) {
-  const priority = item.priority || "informational";
-  const priorityConfig: Record<
-    AnnouncementPriority,
-    { label: string; icon: string }
-  > = {
-    urgent: { label: "URGENT", icon: "!" },
-    action_required: { label: "ACTION REQUIRED", icon: "▶" },
-    upcoming: { label: "UPCOMING", icon: "◷" },
-    informational: { label: "INFO", icon: "ℹ" },
-  };
-
-  const { label, icon } = priorityConfig[priority] || priorityConfig.informational;
+  const priority = resolvePriority(item.priority);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if ((e.key === "Enter" || e.key === " ") && onSelect) {
@@ -438,13 +435,7 @@ export function AnnouncementRow({
       onKeyDown={onSelect ? handleKeyDown : undefined}
     >
       <div className="announcement-row-header">
-        <span
-          className={`announcement-badge priority-${priority}`}
-          data-priority={priority}
-        >
-          <span className="badge-icon" aria-hidden="true">{icon}</span>
-          <span>{label}</span>
-        </span>
+        <AnnouncementPriorityBadge priority={item.priority} />
         <span className="announcement-sender" title={item.from}>
           {item.from}
         </span>
@@ -508,14 +499,6 @@ export function AnnouncementDetail({
     );
   }
 
-  const priority = item.priority || "informational";
-  const priorityLabels: Record<AnnouncementPriority, string> = {
-    urgent: "URGENT",
-    action_required: "ACTION REQUIRED",
-    upcoming: "UPCOMING",
-    informational: "INFO",
-  };
-
   let relativeTimeStr = "";
   try {
     relativeTimeStr = formatRelativeTime(item.receivedAt);
@@ -545,9 +528,7 @@ export function AnnouncementDetail({
 
       <div className="announcement-detail-content">
         <div className="announcement-detail-header-row">
-          <span className={`announcement-badge priority-${priority}`}>
-            {priorityLabels[priority]}
-          </span>
+          <AnnouncementPriorityBadge priority={item.priority} />
           {item.category && (
             <span className="announcement-meta-tag">{item.category}</span>
           )}

@@ -14,7 +14,11 @@ import {
   rawMockMessages,
 } from "@/data/announcement-fixtures";
 
+import { AnnouncementStateControls, AnnouncementStateSession, SnoozedAnnouncements, useAnnouncementState } from "@/components/announcement-state";
+import { isSnoozed } from "@/announcements/state";
+
 export default function AnnouncementsPage() {
+  const state = useAnnouncementState();
   const [isLoading, setIsLoading] = useState(true);
   const [items, setItems] = useState<Announcement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(() => {
@@ -160,11 +164,14 @@ export default function AnnouncementsPage() {
         </p>
       </section>
 
+      <AnnouncementStateSession controller={state} />
+      <SnoozedAnnouncements items={items} controller={state} />
       <div className="announcement-workspace-container">
         {/* Natural Announcement Feed with loading, empty, and error states */}
         <AnnouncementFeed
           status={isLoading ? "loading" : error ? "error" : items.length === 0 ? "empty" : "ready"}
-          items={items}
+          items={items.filter(item => !isSnoozed(state.states[item.id], state.now))}
+          renderControls={item => <AnnouncementStateControls id={item.id} controller={state} />}
           selectedId={selectedId}
           onSelectAnnouncement={handleSelectAnnouncement}
           pageSize={5}

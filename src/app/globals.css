@@ -2108,4 +2108,11 @@ a {
   .announcement-detail-content {
     max-height: none;
   }
-}
+}
+
+.announcement-profile, .announcement-state-controls, .snoozed-announcements { padding: 12px; border: 1px solid #777; margin-bottom: 12px; background: #ececec; color: #202020; overflow-wrap: anywhere; }
+.announcement-state-controls { display: flex; flex-wrap: wrap; gap: 8px; }
+.announcement-profile select { margin-left: 8px; max-width: 100%; color: #111; background: white; padding: 6px; }
+.announcement-state-controls button:focus-visible, .announcement-profile select:focus-visible, .snoozed-announcements button:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
+.announcement-state-controls button:disabled { opacity: .55; }
+.snoozed-announcements li { padding: 8px; }

@@ -14,3 +14,6 @@ next-env.d.ts
 # Private planning files used to prepare this repository
 Chats with webdev head/
 demo_aiml_README.md
+
+# Synthetic user state in local mock mode
+.signal-mock/

@@ -1,0 +1,50 @@
+.panel {
+  padding: 12px;
+  border: 1px solid #666;
+  margin: 12px 0;
+  background: #f5f5f5;
+  color: #171717;
+  overflow-wrap: anywhere;
+}
+.panel h2,
+.panel h3,
+.panel h4 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+.panel p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+.change {
+  padding: 10px 0;
+  border-top: 1px solid #777;
+}
+.tableWrap {
+  overflow-x: auto;
+}
+.panel table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.85rem;
+}
+.panel td,
+.panel th {
+  border: 1px solid #777;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+  min-width: 90px;
+}
+.source {
+  white-space: pre-wrap;
+}
+.panel summary,
+.panel button {
+  cursor: pointer;
+}
+.panel summary:focus-visible,
+.panel button:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 2px;
+}

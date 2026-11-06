@@ -328,6 +328,7 @@ export type AnnouncementFeedErrorProps = {
   onLoadMockMailbox?: () => void;
   className?: string;
   autoFocusRetry?: boolean;
+  renderControls?: (item: Announcement) => React.ReactNode;
 };
 
 /**
@@ -471,6 +472,7 @@ export type AnnouncementDetailProps = {
   item: Announcement | null;
   onClose?: () => void;
   className?: string;
+  controls?: React.ReactNode;
 };
 
 /**
@@ -480,6 +482,7 @@ export function AnnouncementDetail({
   item,
   onClose,
   className,
+  controls,
 }: AnnouncementDetailProps) {
   if (!item) {
     return (
@@ -542,6 +545,7 @@ export function AnnouncementDetail({
         </div>
 
         <h2 className="announcement-detail-subject">{item.subject}</h2>
+        {controls}
 
         {item.actions && item.actions.length > 0 && (
           <div className="announcement-action-callout" data-testid="announcement-actions-box">
@@ -598,6 +602,7 @@ export type AnnouncementFeedProps = {
   skeletonCount?: number;
   className?: string;
   autoFocusRetry?: boolean;
+  renderControls?: (item: Announcement) => React.ReactNode;
 };
 
 /**
@@ -618,6 +623,7 @@ export function AnnouncementFeed({
   skeletonCount = 3,
   className,
   autoFocusRetry,
+  renderControls,
 }: AnnouncementFeedProps) {
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(pageSize);
@@ -749,6 +755,7 @@ export function AnnouncementFeed({
             <AnnouncementDetail
               item={selectedItem}
               onClose={handleCloseDetail}
+              controls={selectedItem ? renderControls?.(selectedItem) : undefined}
             />
           </div>
         </div>

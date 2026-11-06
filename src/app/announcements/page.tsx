@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/app-shell";
-import {
-  Announcement,
-  AnnouncementFeed,
-} from "@/components/announcement-feed";
+import { Announcement, AnnouncementFeed } from "@/components/announcement-feed";
 import {
   isAnnouncementMail,
   mockAnnouncementsFixture,
@@ -14,7 +11,18 @@ import {
   rawMockMessages,
 } from "@/data/announcement-fixtures";
 
+import { groupRevisions } from "@/announcements/revisions";
+import {
+  AnnouncementRevisionHistory,
+  RevisionSuggestions,
+} from "@/components/announcement-revisions";
+import { revisionDemoMessages } from "@/data/revision-fixtures";
+const sourceMessages = [...rawMockMessages, ...revisionDemoMessages];
+
 export default function AnnouncementsPage() {
+  const [confirmedRevisions, setConfirmedRevisions] = useState<Set<string>>(
+    new Set(),
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [items, setItems] = useState<Announcement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(() => {
@@ -58,7 +66,7 @@ export default function AnnouncementsPage() {
         }
         if (simulate === "ready") {
           // Ingest raw mail messages, filtering out unrelated conversations
-          const announcementMail = rawMockMessages
+          const announcementMail = sourceMessages
             .filter(isAnnouncementMail)
             .map(normalizeMailToAnnouncement);
           setItems(announcementMail);
@@ -97,10 +105,14 @@ export default function AnnouncementsPage() {
 
     // Filter raw messages so announcement mail appears, while unrelated mock conversations do not
     setTimeout(() => {
-      const announcementMail = rawMockMessages
+      const announcementMail = sourceMessages
         .filter(isAnnouncementMail)
         .map(normalizeMailToAnnouncement);
-      setItems(announcementMail.length > 0 ? announcementMail : [...mockAnnouncementsFixture]);
+      setItems(
+        announcementMail.length > 0
+          ? announcementMail
+          : [...mockAnnouncementsFixture],
+      );
       setIsLoading(false);
     }, 500);
   };
@@ -137,7 +149,11 @@ export default function AnnouncementsPage() {
     setTimeout(() => {
       // If offline or no mailbox is configured, explain what failed cleanly
       if (typeof navigator !== "undefined" && !navigator.onLine) {
-        setError(new Error("Network connection offline: unable to reach mailbox server"));
+        setError(
+          new Error(
+            "Network connection offline: unable to reach mailbox server",
+          ),
+        );
       } else if (items.length === 0) {
         // Mailbox is checked but empty
         setIsLoading(false);
@@ -146,6 +162,18 @@ export default function AnnouncementsPage() {
       }
     }, 600);
   };
+
+  const loadedIds = new Set(items.map((item) => item.id));
+  const revisions = groupRevisions(
+    sourceMessages.filter((message) => loadedIds.has(message.id)),
+    confirmedRevisions,
+  );
+  const groupedItems = revisions.groups
+    .map((group) => items.find((item) => item.id === group.latest.id)!)
+    .filter(Boolean);
+  const selectedGroup = revisions.groups.find((group) =>
+    group.messages.some((message) => message.id === selectedId),
+  );
 
   return (
     <AppShell activePath="/announcements" pageLabel="Announcements">
@@ -160,12 +188,32 @@ export default function AnnouncementsPage() {
         </p>
       </section>
 
+      <RevisionSuggestions
+        suggestions={revisions.suggestions}
+        onConfirm={(key) =>
+          setConfirmedRevisions((previous) => new Set([...previous, key]))
+        }
+      />
       <div className="announcement-workspace-container">
         {/* Natural Announcement Feed with loading, empty, and error states */}
         <AnnouncementFeed
-          status={isLoading ? "loading" : error ? "error" : items.length === 0 ? "empty" : "ready"}
-          items={items}
-          selectedId={selectedId}
+          status={
+            isLoading
+              ? "loading"
+              : error
+                ? "error"
+                : items.length === 0
+                  ? "empty"
+                  : "ready"
+          }
+          items={groupedItems}
+          renderControls={(item) => {
+            const group = revisions.groups.find(
+              (group) => group.latest.id === item.id,
+            );
+            return group ? <AnnouncementRevisionHistory group={group} /> : null;
+          }}
+          selectedId={selectedGroup?.latest.id ?? selectedId}
           onSelectAnnouncement={handleSelectAnnouncement}
           pageSize={5}
           error={error}
@@ -183,15 +231,19 @@ export default function AnnouncementsPage() {
             i
           </span>
           <p>
-            SIGNAL connects to university email accounts using delegated, read-only
-            OAuth permissions. Messages are analyzed locally; mailbox contents
-            are never modified or stored on external servers.
+            SIGNAL connects to university email accounts using delegated,
+            read-only OAuth permissions. Messages are analyzed locally; mailbox
+            contents are never modified or stored on external servers.
           </p>
           <button
             type="button"
             className="classic-button"
             onClick={handleSync}
-            style={{ marginLeft: "auto", alignSelf: "center", whiteSpace: "nowrap" }}
+            style={{
+              marginLeft: "auto",
+              alignSelf: "center",
+              whiteSpace: "nowrap",
+            }}
           >
             Check Mailbox
           </button>

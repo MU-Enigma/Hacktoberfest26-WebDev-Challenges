@@ -1,0 +1,9 @@
+# Announcement search and filters (SIG-104)
+
+The filter panel supports keyword search in subject, body and preview; sender substring; inclusive received-date range; category; priority; attachment presence; and handled state from SIG-107's user-scoped store. Filters combine with AND. A missing user state is treated as not handled. Dates use APP_TIME_ZONE, not the host timezone. Invalid URL enums/dates are ignored, and reversed ranges explain the issue and return no results.
+
+The q, sender, from, to, category, priority, attachment and handled query parameters are the canonical state. Search waits 300ms after typing. Filter changes push browser history and remove stale selected-announcement IDs; back/forward restore the controls, results and selection. Clear all removes only filter keys and selection while preserving other parameters such as simulate=ready. Unknown category values stay visible in the dropdown so a shared link remains understandable. Search text is rendered as text, never HTML.
+
+No-result guidance lists the active filters and offers clear-all. Pagination resets for a changed filter set. Existing mailbox loading/error states and the snoozed-items disclosure remain available. In local mock mode load the mailbox or use ?simulate=ready to start with records. Handled filters rely on the authenticated/demo session behavior documented in announcement-state.md.
+
+Tests cover URL round trips, preservation of unrelated parameters, filter combinations, malformed URL values, local date boundaries, attachment presence, body search and immutability. Browser verification covers a 390px viewport, debounced search, an empty combination, clear-all, back navigation and refresh. The animated GIF in docs/images/announcement-filters-mobile.gif records the actual mobile interaction as sequential browser screenshots.

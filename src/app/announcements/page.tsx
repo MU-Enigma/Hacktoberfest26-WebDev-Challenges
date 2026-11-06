@@ -15,10 +15,13 @@ import {
 } from "@/data/announcement-fixtures";
 
 import { AnnouncementStateControls, AnnouncementStateSession, SnoozedAnnouncements, useAnnouncementState } from "@/components/announcement-state";
+import { AnnouncementFilterControls, NoAnnouncementResults, useAnnouncementFilters } from "@/components/announcement-filters";
+import { filterAnnouncements } from "@/announcements/filters";
 import { isSnoozed } from "@/announcements/state";
 
 export default function AnnouncementsPage() {
   const state = useAnnouncementState();
+  const search = useAnnouncementFilters();
   const [isLoading, setIsLoading] = useState(true);
   const [items, setItems] = useState<Announcement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(() => {
@@ -39,6 +42,7 @@ export default function AnnouncementsPage() {
       }
     };
     window.addEventListener("popstate", handlePopState);
+    window.addEventListener("signal-filters", handlePopState);
 
     const timer = setTimeout(() => {
       if (typeof window !== "undefined") {
@@ -77,6 +81,7 @@ export default function AnnouncementsPage() {
     return () => {
       clearTimeout(timer);
       window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("signal-filters", handlePopState);
     };
   }, []);
 
@@ -151,6 +156,8 @@ export default function AnnouncementsPage() {
     }, 600);
   };
 
+  const visibleItems = filterAnnouncements(items.filter(item => !isSnoozed(state.states[item.id], state.now)), search.filters, state.states);
+
   return (
     <AppShell activePath="/announcements" pageLabel="Announcements">
       <section className="page-heading module-heading">
@@ -165,12 +172,15 @@ export default function AnnouncementsPage() {
       </section>
 
       <AnnouncementStateSession controller={state} />
+      <AnnouncementFilterControls filters={search.filters} onChange={search.setFilters} clear={search.clear} categories={[...new Set(items.map(item => item.category ?? "General"))]} />
       <SnoozedAnnouncements items={items} controller={state} />
       <div className="announcement-workspace-container">
         {/* Natural Announcement Feed with loading, empty, and error states */}
         <AnnouncementFeed
-          status={isLoading ? "loading" : error ? "error" : items.length === 0 ? "empty" : "ready"}
-          items={items.filter(item => !isSnoozed(state.states[item.id], state.now))}
+          key={JSON.stringify(search.filters)}
+          status={isLoading ? "loading" : error ? "error" : visibleItems.length === 0 ? "empty" : "ready"}
+          emptyContent={items.length > 0 ? <NoAnnouncementResults filters={search.filters} clear={search.clear} /> : undefined}
+          items={visibleItems}
           renderControls={item => <AnnouncementStateControls id={item.id} controller={state} />}
           selectedId={selectedId}
           onSelectAnnouncement={handleSelectAnnouncement}

@@ -329,6 +329,7 @@ export type AnnouncementFeedErrorProps = {
   className?: string;
   autoFocusRetry?: boolean;
   renderControls?: (item: Announcement) => React.ReactNode;
+  emptyContent?: React.ReactNode;
 };
 
 /**
@@ -603,6 +604,7 @@ export type AnnouncementFeedProps = {
   className?: string;
   autoFocusRetry?: boolean;
   renderControls?: (item: Announcement) => React.ReactNode;
+  emptyContent?: React.ReactNode;
 };
 
 /**
@@ -624,6 +626,7 @@ export function AnnouncementFeed({
   className,
   autoFocusRetry,
   renderControls,
+  emptyContent,
 }: AnnouncementFeedProps) {
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(pageSize);
@@ -647,7 +650,7 @@ export function AnnouncementFeed({
   if (effectiveStatus === "loading") {
     screenReaderMessage = "Loading announcements. Please wait...";
   } else if (effectiveStatus === "empty") {
-    screenReaderMessage =
+    screenReaderMessage = emptyContent ? "No announcements match the active filters." :
       "Announcement feed is empty. No messages available. Connect a campus mailbox or click Load Mock Mailbox to test.";
   } else if (effectiveStatus === "error") {
     screenReaderMessage = `Error: ${sanitizeErrorMessage(error)}. Press Retry Synchronization to attempt loading again.`;
@@ -700,12 +703,12 @@ export function AnnouncementFeed({
         <AnnouncementFeedSkeleton count={skeletonCount} />
       )}
 
-      {effectiveStatus === "empty" && (
+      {effectiveStatus === "empty" && (emptyContent ?? (
         <AnnouncementFeedEmpty
           onLoadMockMailbox={onLoadMockMailbox}
           onConnectMailbox={onConnectMailbox}
         />
-      )}
+      ))}
 
       {effectiveStatus === "error" && (
         <AnnouncementFeedError

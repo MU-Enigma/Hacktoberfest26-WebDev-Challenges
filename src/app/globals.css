@@ -2108,4 +2108,18 @@ a {
   .announcement-detail-content {
     max-height: none;
   }
-}
+}
+
+.announcement-profile, .announcement-state-controls, .snoozed-announcements { padding: 12px; border: 1px solid #777; margin-bottom: 12px; background: #ececec; color: #202020; overflow-wrap: anywhere; }
+.announcement-state-controls { display: flex; flex-wrap: wrap; gap: 8px; }
+.announcement-profile select { margin-left: 8px; max-width: 100%; color: #111; background: white; padding: 6px; }
+.announcement-state-controls button:focus-visible, .announcement-profile select:focus-visible, .snoozed-announcements button:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
+.announcement-state-controls button:disabled { opacity: .55; }
+.snoozed-announcements li { padding: 8px; }
+
+.announcement-filter-panel { padding: 12px; margin-bottom: 14px; border: 1px solid #666; color: #171717; background: #e8e8e8; }
+.announcement-filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(190px,100%), 1fr)); gap: 10px; }
+.announcement-filter-grid label { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.announcement-filter-grid input, .announcement-filter-grid select { padding: 7px; border: 1px solid #666; color: #111; background: #fff; width: 100%; min-width: 0; }
+.announcement-filter-grid input:focus-visible, .announcement-filter-grid select:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
+.announcement-filter-panel p { overflow-wrap: anywhere; }
